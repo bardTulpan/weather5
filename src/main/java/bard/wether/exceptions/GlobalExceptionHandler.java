@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    //добавить dto ошибки status message
+
+
     @ExceptionHandler(TemperatureConversionException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public String handleTemperatureConversion(TemperatureConversionException ex) {

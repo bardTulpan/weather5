@@ -25,7 +25,7 @@ public class SessionService {
 
     public User validateSession(UUID sessionId) {
         Session session = sessionRepository.findById(sessionId);
-        if (session == null || session.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (session == null || session.getExpiresAt().isBefore(LocalDateTime.now())) { //добавить ошибку для ession.getExpiresAt().isBefore(LocalDateTime.now()
             throw new NotFoundException("session not found");
         }
 
