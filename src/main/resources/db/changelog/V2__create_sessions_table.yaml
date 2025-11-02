@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-sessions-table
+      author: bard
+      changes:
+        - createTable:
+            tableName: sessions
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_sessions_user_id
+                    references: users(id)
+              - column:
+                  name: expires_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            indexName: idx_sessions_user_id
+            tableName: sessions
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            indexName: idx_sessions_expires_at
+            tableName: sessions
+            columns:
+              - column:
+                  name: expires_at
+
+        - sql:
+            sql: >
+              INSERT INTO sessions (id, user_id, expires_at) 
+              VALUES 
+              (gen_random_uuid(), 1, NOW() + INTERVAL '24 hours'),
+              (gen_random_uuid(), 2, NOW() + INTERVAL '12 hours'),
+              (gen_random_uuid(), 3, NOW() + INTERVAL '48 hours')

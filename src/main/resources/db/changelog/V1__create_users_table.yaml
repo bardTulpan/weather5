@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-users-table
+      author: bard
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: login
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: login
+                  value: "testuser"
+              - column:
+                  name: password
+                  value: "password123"
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: login
+                  value: "admin"
+              - column:
+                  name: password
+                  value: "admin456"
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: login
+                  value: "weather_lover"
+              - column:
+                  name: password
+                  value: "sunshine789"
