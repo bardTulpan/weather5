@@ -7,6 +7,7 @@ import bard.wether.entity.Location;
 import bard.wether.exceptions.NotFoundException;
 import bard.wether.exceptions.OpenWeatherException;
 import bard.wether.exceptions.TemperatureConversionException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,16 +21,21 @@ public class WeatherService {
 
 
     private final WebClient webClient;
-    private final String API_KEY = "fc1e39b85ff6b83957c733adb0e65cf8";
 
-    public WeatherService(WebClient.Builder webClientBuilder) {
+    private String API_KEY;
+
+    private String apiUrl;
+
+    public WeatherService(WebClient.Builder webClientBuilder, @Value("${weather.api.key}") String apiKey, @Value("${weather.api.url}") String apiUrl) {
+        this.apiUrl = apiUrl;
+        this.API_KEY = apiKey;
         this.webClient = webClientBuilder
-                .baseUrl("https://api.openweathermap.org/data/2.5")
+                .baseUrl(apiUrl)
                 .build();
     }
 
-    public boolean isLocationExists(String cityName) {
-        WeatherResponse weatherResponse = webClient.get()
+    public Mono<Boolean> isLocationExists(String cityName) {
+        return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/weather")
                         .queryParam("q", cityName)
@@ -45,9 +51,9 @@ public class WeatherService {
                         response -> Mono.error(new OpenWeatherException("Error Open Weather API"))
                 )
                 .bodyToMono(WeatherResponse.class)
-                .block();
+                .map(response -> true)
+                .onErrorReturn(false);  // Если ошибка (включая 404) - возвращаем false
 
-        return weatherResponse != null;
     }
 
     public String getTemperatureForCity(String cityName) {
