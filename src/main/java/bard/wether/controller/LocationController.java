@@ -5,16 +5,15 @@ import bard.wether.dto.LocationWeatherDTO;
 import bard.wether.dto.WeatherResponse;
 import bard.wether.entity.User;
 import bard.wether.exceptions.NotFoundException;
-import bard.wether.exceptions.OpenWeatherException;
 import bard.wether.service.LocationService;
 import bard.wether.service.SessionService;
 import bard.wether.service.WeatherService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.UUID;
 
 @RequestMapping("/api/locations")
 @RestController
@@ -31,12 +30,16 @@ public class LocationController {
         this.sessionService = sessionService;
     }
 
+    private User getCurrentUser(HttpServletRequest request) {
+        return (User) request.getAttribute("CURRENT_USER");
+    }
+
     @GetMapping("/search")
     public ApiResponse<Mono<Boolean>> searchLocation(@RequestParam String cityName) {
         if (weatherService.isLocationExists(cityName).block()) {
             return ApiResponse.success("City exists", null);
         }
-        throw new NotFoundException("City not found"); //наверное можно написать без этого
+        throw new NotFoundException("City not found");
     }
 
     @GetMapping("/showWeather")
@@ -46,8 +49,8 @@ public class LocationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<Void> save(@CookieValue("SESSION_ID") UUID sessionId, @RequestParam String cityName) {
-        User user = sessionService.validateSession(sessionId);
+    public ApiResponse<Void> save(@RequestParam String cityName, HttpServletRequest request) {
+        User user = getCurrentUser(request);
         if (weatherService.isLocationExists(cityName).block()) {
             locationService.save(cityName, user);
             return ApiResponse.success("Location saved", null);
@@ -56,15 +59,15 @@ public class LocationController {
     }
 
     @GetMapping
-    public ApiResponse<List<LocationWeatherDTO>> getLocations(@CookieValue("SESSION_ID") UUID sessionId) {
-        User user = sessionService.validateSession(sessionId);
+    public ApiResponse<List<LocationWeatherDTO>> getLocations(HttpServletRequest request) {
+        User user = getCurrentUser(request);
         List<LocationWeatherDTO> locationList = locationService.getUserLocationsWithWeather(user);
         return ApiResponse.success("User locations retrieved", locationList);
     }
 
     @DeleteMapping("/{locationId}")
-    public ApiResponse<Void> deleteLocation(@CookieValue("SESSION_ID") UUID sessionId, @PathVariable int locationId) {
-        User user = sessionService.validateSession(sessionId);
+    public ApiResponse<Void> deleteLocation(@PathVariable int locationId, HttpServletRequest request) {
+        User user = getCurrentUser(request);
         locationService.deleteUserLocation((long) locationId, user);
         return ApiResponse.success("Location deleted", null);
     }

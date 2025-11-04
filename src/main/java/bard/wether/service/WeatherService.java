@@ -5,7 +5,7 @@ import bard.wether.dto.SimpleWeatherDTO;
 import bard.wether.dto.WeatherResponse;
 import bard.wether.entity.Location;
 import bard.wether.exceptions.NotFoundException;
-import bard.wether.exceptions.OpenWeatherException;
+import bard.wether.exceptions.ExternalServiceInteractionException;
 import bard.wether.exceptions.TemperatureConversionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -22,13 +22,13 @@ public class WeatherService {
 
     private final WebClient webClient;
 
-    private String API_KEY;
+    private String apiKey;
 
     private String apiUrl;
 
     public WeatherService(WebClient.Builder webClientBuilder, @Value("${weather.api.key}") String apiKey, @Value("${weather.api.url}") String apiUrl) {
         this.apiUrl = apiUrl;
-        this.API_KEY = apiKey;
+        this.apiKey = apiKey;
         this.webClient = webClientBuilder
                 .baseUrl(apiUrl)
                 .build();
@@ -39,7 +39,7 @@ public class WeatherService {
                 .uri(uriBuilder -> uriBuilder
                         .path("/weather")
                         .queryParam("q", cityName)
-                        .queryParam("appid", API_KEY)
+                        .queryParam("appid", apiKey)
                         .build())
                 .retrieve()
                 .onStatus(
@@ -48,11 +48,11 @@ public class WeatherService {
                 )
                 .onStatus(
                         HttpStatusCode::is5xxServerError,
-                        response -> Mono.error(new OpenWeatherException("Error Open Weather API"))
+                        response -> Mono.error(new ExternalServiceInteractionException("Error Open Weather API"))
                 )
                 .bodyToMono(WeatherResponse.class)
                 .map(response -> true)
-                .onErrorReturn(false);  // Если ошибка (включая 404) - возвращаем false
+                .onErrorReturn(false);
 
     }
 
@@ -62,10 +62,9 @@ public class WeatherService {
                 .orElseThrow(() -> new NotFoundException(cityName + "not found"));
 
         if (weatherResponse.getMain() == null) {
-            throw new OpenWeatherException("No temperature data for city: " + cityName);
+            throw new ExternalServiceInteractionException("No temperature data for city: " + cityName);
         }
 
-        // Конвертируем из Кельвинов в Цельсии
         double tempKelvin = weatherResponse.getMain().getTemp();
         if (tempKelvin < 0) {
             throw new TemperatureConversionException("Invalid temperature value: " + tempKelvin);
@@ -93,12 +92,12 @@ public class WeatherService {
     }
 
 
-    public Mono<WeatherResponse> getWeather(String city) { //смута пипец обработка такая-себе
+    public Mono<WeatherResponse> getWeather(String city) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/weather")
                         .queryParam("q", city)
-                        .queryParam("appid", API_KEY)
+                        .queryParam("appid", apiKey)
                         .build())
                 .retrieve()
                 .onStatus(
@@ -107,10 +106,9 @@ public class WeatherService {
                 )
                 .onStatus(
                         HttpStatusCode::is5xxServerError,
-                        response -> Mono.error(new OpenWeatherException("Ошибка сервера OpenWeather"))
+                        response -> Mono.error(new ExternalServiceInteractionException("Ошибка сервера OpenWeather"))
                 )
                 .bodyToMono(WeatherResponse.class);
-        // УБИРАЕМ onErrorResume - пусть исключения прокидываются
     }
 
     public Mono<SimpleWeatherDTO> getSimpleWeather(String city) {

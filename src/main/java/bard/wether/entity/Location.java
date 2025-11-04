@@ -40,14 +40,4 @@ public class Location {
         this.longitude = longitude;
     }
 
-    @Override
-    public String toString() {
-        return "Location{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", userId=" + (user != null ? user.getId() : "null") +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                '}';
-    }
 }

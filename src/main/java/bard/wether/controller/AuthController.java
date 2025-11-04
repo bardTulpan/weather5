@@ -1,5 +1,6 @@
 package bard.wether.controller;
 
+import bard.wether.dto.ApiResponse;
 import bard.wether.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,26 +12,28 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
     @PostMapping("/register")
-    public String register(@RequestParam String username, @RequestParam String password) {
-        return authService.registerUser(username, password);
+    public ApiResponse<Void> register(@RequestParam String username, @RequestParam String password) {
+        authService.registerUser(username, password);
+        return ApiResponse.success("User registered successfully", null);
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username,
+    public ApiResponse<Void> login(@RequestParam String username,
                         @RequestParam String password,
                         HttpServletResponse response) {
-        return authService.loginUser(username, password, response);
+        authService.loginUser(username, password, response);
+        return ApiResponse.success("User logged successfully", null);
     }
 
     @PostMapping("/logout")
-    public String logout(@CookieValue(value = "SESSION_ID", required = false) String sessionId,
-                         HttpServletResponse response) {
-        return authService.logoutUser(sessionId, response);
+    public ApiResponse<Void> logout(@CookieValue(value = "SESSION_ID", required = false) String sessionId,
+                                      HttpServletResponse response) {
+        authService.logoutUser(sessionId, response);
+        return ApiResponse.success("User logged out", null);
     }
 }

@@ -41,6 +41,26 @@ public class HibernateConfig {
     @Value("${hibernate.format_sql:true}")
     private String hibernateFormatSql;
 
+    @Value("${hibernate.jdbc.batch_size:20}")
+    private String hibernateBatchSize;
+
+    @Value("${spring.datasource.hikari.maximum-pool-size:20}")
+    private int maxPoolSize;
+
+    @Value("${spring.datasource.hikari.minimum-idle:5}")
+    private int minIdle;
+
+    @Value("${spring.datasource.hikari.connection-timeout:30000}")
+    private int connectionTimeout;
+
+    @Value("${spring.datasource.hikari.idle-timeout:600000}")
+    private int idleTimeout;
+
+    @Value("${spring.datasource.hikari.max-lifetime:1800000}")
+    private int maxLifetime;
+
+
+
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
@@ -58,11 +78,11 @@ public class HibernateConfig {
         dataSource.setJdbcUrl(dbUrl);
         dataSource.setUsername(dbUsername);
         dataSource.setPassword(dbPassword);
-        dataSource.setMaximumPoolSize(20);
-        dataSource.setMinimumIdle(5);
-        dataSource.setConnectionTimeout(30000);
-        dataSource.setIdleTimeout(600000);
-        dataSource.setMaxLifetime(1800000);
+        dataSource.setMaximumPoolSize(maxPoolSize);
+        dataSource.setMinimumIdle(minIdle);
+        dataSource.setConnectionTimeout(connectionTimeout);
+        dataSource.setIdleTimeout(idleTimeout);
+        dataSource.setMaxLifetime(maxLifetime);
         return dataSource;
     }
 
@@ -79,7 +99,7 @@ public class HibernateConfig {
         properties.setProperty("hibernate.dialect", hibernateDialect);
         properties.setProperty("hibernate.show_sql", hibernateShowSql);
         properties.setProperty("hibernate.format_sql", hibernateFormatSql);
-        properties.setProperty("hibernate.jdbc.batch_size", "20");
+        properties.setProperty("hibernate.jdbc.batch_size", hibernateBatchSize);
         properties.setProperty("hibernate.order_inserts", "true");
         properties.setProperty("hibernate.order_updates", "true");
         return properties;

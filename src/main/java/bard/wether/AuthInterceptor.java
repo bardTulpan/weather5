@@ -25,7 +25,6 @@ public class AuthInterceptor implements HandlerInterceptor {
                              HttpServletResponse response,
                              Object handler) throws Exception {
 
-        // Разрешаем доступ к /auth/login и /auth/logout без проверки
         String path = request.getRequestURI();
         if (path.startsWith("/api/auth")) {
             return true;
@@ -34,28 +33,26 @@ public class AuthInterceptor implements HandlerInterceptor {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("No cookies found");
             return false;
         }
 
         Cookie sessionCookie = Arrays.stream(cookies)
-                .filter(c -> c.getName().equals("SESSION_ID"))
+                .filter(c -> "SESSION_ID".equals(c.getName()))
                 .findFirst()
                 .orElse(null);
 
         if (sessionCookie == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("No session cookie");
             return false;
         }
 
-        User user = sessionService.validateSession(UUID.fromString(sessionCookie.getValue()));
-        if (user == null) {
+        try {
+            User user = sessionService.validateSession(UUID.fromString(sessionCookie.getValue()));
+            request.setAttribute("CURRENT_USER", user);
+            return true;
+        } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid or expired session");
             return false;
         }
-        return true;
-
     }
 }

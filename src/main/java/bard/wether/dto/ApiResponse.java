@@ -25,7 +25,6 @@ public class ApiResponse<T> {
         this.errorCode = errorCode;
     }
 
-    // Статические фабричные методы
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(true, "Success", data);
     }

@@ -1,6 +1,7 @@
-package bard.wether.exceptions;
+package bard.wether.controller;
 
 import bard.wether.dto.ApiResponse;
+import bard.wether.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,9 +19,9 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
-    @ExceptionHandler(OpenWeatherException.class)
+    @ExceptionHandler(ExternalServiceInteractionException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiResponse<String> handleOpenWeatherException(OpenWeatherException ex) {
+    public ApiResponse<String> handleOpenWeatherException(ExternalServiceInteractionException ex) {
         log.error(ex.getMessage(), ex);
         return ApiResponse.error(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
     }

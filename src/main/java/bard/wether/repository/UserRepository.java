@@ -17,12 +17,6 @@ public class UserRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<User> findAll() {
-        TypedQuery<User> query = entityManager.createQuery(
-                "SELECT u FROM User u", User.class);
-        return query.getResultList();
-    }
-
     public User findByLogin(String login) {
         TypedQuery<User> query = entityManager.createQuery(
                 "SELECT u FROM User u WHERE u.login = :login", User.class);
@@ -34,7 +28,7 @@ public class UserRepository {
     public User save(User user) {
         if (user.getId() == null) {
             entityManager.persist(user);
-            entityManager.flush(); // Принудительно сохраняем чтобы получить ID
+            entityManager.flush();
             return user;
         } else {
             return entityManager.merge(user);

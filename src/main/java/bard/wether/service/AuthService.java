@@ -27,14 +27,13 @@ public class AuthService {
         this.sessionService = sessionService;
     }
 
-    public String registerUser(String username, String password) {
+    public void registerUser(String username, String password) {
         boolean created = createUser(username, password);
         if (!created) throw new AlreadyExistsException("Username already exists");
-        return "User registered";
     }
 
 
-    public String loginUser(String username, String password, HttpServletResponse response) {
+    public void loginUser(String username, String password, HttpServletResponse response) {
         Integer userId = validateUser(username, password);
         if (userId == null) {
             throw new InvalidCredException("Invalid credentials");
@@ -43,13 +42,12 @@ public class AuthService {
         User user = userService.findByLogin(username);
         Session session = sessionService.createSession(user);
         createSessionCookie(response, session.getId().toString());
-        return "Logged in";
     }
 
     public boolean createUser(String username, String password) {
         User existingUser = userRepository.findByLogin(username);
         if (existingUser != null) {
-            throw new AlreadyExistsException("User already exists"); // пользователь уже существует
+            throw new AlreadyExistsException("User already exists");
         }
 
         User newUser = new User();
@@ -59,12 +57,11 @@ public class AuthService {
         return true;
     }
 
-    public String logoutUser(String sessionId, HttpServletResponse response) {
+    public void logoutUser(String sessionId, HttpServletResponse response) {
         if (sessionId != null) {
             sessionService.destroySession(UUID.fromString(sessionId));
         }
         clearSessionCookie(response);
-        return "Logged out";
     }
 
     public Integer validateUser(String username, String password) {
@@ -78,9 +75,9 @@ public class AuthService {
     private void createSessionCookie(HttpServletResponse response, String sessionId) {
         Cookie cookie = new Cookie("SESSION_ID", sessionId);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false); // В продакшене должно быть true
+        cookie.setSecure(false);
         cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 2); // 2 часа
+        cookie.setMaxAge(60 * 60 * 2);
         cookie.setAttribute("SameSite", "Strict");
         response.addCookie(cookie);
     }
