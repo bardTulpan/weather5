@@ -7,54 +7,50 @@ import bard.wether.exceptions.InvalidCredException;
 import bard.wether.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class AuthService {
+    @Value("${cookie.max.age}")
+    private int cookieMaxAge;
+    @Value("${cookie.default.name}")
+    private String defaultCookieName;
+
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
     private final SessionService sessionService;
 
-    public AuthService(UserRepository userRepository, UserService userService, SessionService sessionService) {
+    public AuthService(UserRepository userRepository, SessionService sessionService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.userService = userService;
         this.sessionService = sessionService;
+        this.passwordEncoder = passwordEncoder;
     }
-
-    public void registerUser(String username, String password) {
-        boolean created = createUser(username, password);
-        if (!created) throw new AlreadyExistsException("Username already exists");
-    }
-
 
     public void loginUser(String username, String password, HttpServletResponse response) {
-        Integer userId = validateUser(username, password);
-        if (userId == null) {
-            throw new InvalidCredException("Invalid credentials");
-        }
+        User user = userRepository.findByLogin(username)
+                .filter(u -> passwordEncoder.matches(password, u.getPassword()))
+                .orElseThrow(() -> new InvalidCredException("Invalid credentials"));
 
-        User user = userService.findByLogin(username);
         Session session = sessionService.createSession(user);
         createSessionCookie(response, session.getId().toString());
     }
 
-    public boolean createUser(String username, String password) {
-        User existingUser = userRepository.findByLogin(username);
-        if (existingUser != null) {
-            throw new AlreadyExistsException("User already exists");
-        }
+    public void registerUser(String username, String password) {
+        userRepository.findByLogin(username)
+                .ifPresent(user -> {
+                    throw new AlreadyExistsException("User already exists");
+                });
 
         User newUser = new User();
         newUser.setLogin(username);
         newUser.setPassword(passwordEncoder.encode(password));
         userRepository.save(newUser);
-        return true;
     }
 
     public void logoutUser(String sessionId, HttpServletResponse response) {
@@ -64,26 +60,18 @@ public class AuthService {
         clearSessionCookie(response);
     }
 
-    public Integer validateUser(String username, String password) {
-        User user = userRepository.findByLogin(username);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return user.getId();
-        }
-        return null;
-    }
-
     private void createSessionCookie(HttpServletResponse response, String sessionId) {
-        Cookie cookie = new Cookie("SESSION_ID", sessionId);
+        Cookie cookie = new Cookie(defaultCookieName, sessionId);
         cookie.setHttpOnly(true);
         cookie.setSecure(false);
         cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 2);
+        cookie.setMaxAge(cookieMaxAge);
         cookie.setAttribute("SameSite", "Strict");
         response.addCookie(cookie);
     }
 
     private void clearSessionCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie("SESSION_ID", "");
+        Cookie cookie = new Cookie(defaultCookieName, "");
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);

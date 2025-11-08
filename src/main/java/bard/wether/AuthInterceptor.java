@@ -47,7 +47,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         try {
-            User user = sessionService.validateSession(UUID.fromString(sessionCookie.getValue()));
+            User user = sessionService.getUserBySession(UUID.fromString(sessionCookie.getValue()));
             request.setAttribute("CURRENT_USER", user);
             return true;
         } catch (Exception e) {

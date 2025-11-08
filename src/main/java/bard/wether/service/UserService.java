@@ -4,6 +4,8 @@ import bard.wether.entity.User;
 import bard.wether.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -13,7 +15,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User findByLogin(String login) {
+    public Optional<User> findByLogin(String login) {
         return userRepository.findByLogin(login);
     }
 }

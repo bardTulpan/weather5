@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Table(name = "locations")
+@Table(name = "location")
 public class Location {
 
     @Id
@@ -24,10 +24,10 @@ public class Location {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "latitude", precision = 10, scale = 8)
+    @Column(name = "latitude", precision = 12, scale = 8)
     private BigDecimal latitude;
 
-    @Column(name = "longitude", precision = 11, scale = 8)
+    @Column(name = "longitude", precision = 13, scale = 8)
     private BigDecimal longitude;
 
     public Location() {

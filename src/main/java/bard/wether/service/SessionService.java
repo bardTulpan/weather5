@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -24,11 +25,12 @@ public class SessionService {
     }
 
     public Session createSession(User user) {
+        Objects.requireNonNull(user, "User cannot be null");
         Session session = new Session(user, LocalDateTime.now().plusHours(SESSION_TIMEOUT_HOURS));
         return sessionRepository.save(session);
     }
 
-    public User validateSession(UUID sessionId) {
+    public User getUserBySession(UUID sessionId) {
         Session session = sessionRepository.findById(sessionId);
         if (session == null) {
             throw new NotFoundException("session not found");

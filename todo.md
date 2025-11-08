@@ -1,5 +1,3 @@
-todo
-- WeatherClient + weatherService
-- сделать профили
-- прочитать по optional
-- 
+профили
+пагинация+-
+решить проблему с бд+

@@ -1,24 +1,23 @@
 databaseChangeLog:
   - changeSet:
-      id: create-sessions-table
+      id: create-session-table
       author: bard
       changes:
         - createTable:
-            tableName: sessions
+            tableName: session
             columns:
               - column:
                   name: id
                   type: UUID
                   constraints:
                     primaryKey: true
-                    nullable: false
               - column:
                   name: user_id
                   type: BIGINT
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_sessions_user_id
-                    references: users(id)
+                    foreignKeyName: fk_session_user_id
+                    references: user(id)
               - column:
                   name: expires_at
                   type: TIMESTAMP
@@ -26,23 +25,15 @@ databaseChangeLog:
                     nullable: false
 
         - createIndex:
-            indexName: idx_sessions_user_id
-            tableName: sessions
+            indexName: idx_session_user_id
+            tableName: session
             columns:
               - column:
                   name: user_id
 
         - createIndex:
-            indexName: idx_sessions_expires_at
-            tableName: sessions
+            indexName: idx_session_expires_at
+            tableName: session
             columns:
               - column:
                   name: expires_at
-
-        - sql:
-            sql: >
-              INSERT INTO sessions (id, user_id, expires_at) 
-              VALUES 
-              (gen_random_uuid(), 1, NOW() + INTERVAL '24 hours'),
-              (gen_random_uuid(), 2, NOW() + INTERVAL '12 hours'),
-              (gen_random_uuid(), 3, NOW() + INTERVAL '48 hours')
