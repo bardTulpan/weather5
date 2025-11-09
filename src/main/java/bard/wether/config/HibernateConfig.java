@@ -60,7 +60,6 @@ public class HibernateConfig {
     private int maxLifetime;
 
 
-
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();

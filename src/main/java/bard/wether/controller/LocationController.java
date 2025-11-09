@@ -1,14 +1,11 @@
 package bard.wether.controller;
 
-import bard.wether.client.WeatherClient;
 import bard.wether.dto.*;
 import bard.wether.entity.User;
 import bard.wether.service.LocationService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequestMapping("/api/locations")
 @RestController

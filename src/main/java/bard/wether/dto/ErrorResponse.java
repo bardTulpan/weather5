@@ -1,7 +1,9 @@
 package bard.wether.dto;
 
 import lombok.Getter;
+
 import java.time.Instant;
+
 @Getter
 public class ErrorResponse {
     private final String error;

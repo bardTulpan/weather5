@@ -15,10 +15,9 @@ import java.util.UUID;
 @Service
 public class SessionService {
 
+    private final SessionRepository sessionRepository;
     @Value("${session.timeout.hours}")
     private int SESSION_TIMEOUT_HOURS;
-
-    private final SessionRepository sessionRepository;
 
     public SessionService(SessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;

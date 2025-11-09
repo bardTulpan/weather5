@@ -89,7 +89,7 @@ public class LocationService {
 
     public void deleteUserLocation(Long locationId, User user) {
         Location location = locationRepository.findByIdAndUser(locationId, user)
-                .orElseThrow(() -> new ExternalServiceInteractionException("Location not found or no access"));
+                .orElseThrow(() -> new NotFoundException("Location not found or no access"));
         locationRepository.delete(location);
     }
 

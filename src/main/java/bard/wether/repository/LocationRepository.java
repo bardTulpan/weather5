@@ -57,7 +57,7 @@ public class LocationRepository {
             return Optional.of(query.getSingleResult());
         } catch (NoResultException e) {
             return Optional.empty();
-        }  catch (Exception e) {
+        } catch (Exception e) {
             log.error("ОШИБКА БД при поиске location. ID: {}, User: {}", id, user.getId(), e);
             throw new DataAccessException("Ошибка при поиске location.", e);
         }

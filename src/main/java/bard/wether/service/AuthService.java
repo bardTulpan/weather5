@@ -11,20 +11,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class AuthService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final SessionService sessionService;
     @Value("${cookie.max.age}")
     private int cookieMaxAge;
     @Value("${cookie.default.name}")
     private String defaultCookieName;
-
-
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final SessionService sessionService;
+    @Value("${server.servlet.session.cookie.secure}")
+    private boolean isCookieSecure;
 
     public AuthService(UserRepository userRepository, SessionService sessionService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -63,7 +62,7 @@ public class AuthService {
     private void createSessionCookie(HttpServletResponse response, String sessionId) {
         Cookie cookie = new Cookie(defaultCookieName, sessionId);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(isCookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(cookieMaxAge);
         cookie.setAttribute("SameSite", "Strict");

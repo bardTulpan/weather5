@@ -24,13 +24,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public void login(@ModelAttribute AuthRequest authRequest,
-                        HttpServletResponse response) {
+                      HttpServletResponse response) {
         authService.loginUser(authRequest.getUsername(), authRequest.getPassword(), response);
     }
 
     @PostMapping("/logout")
     public void logout(@CookieValue(value = "SESSION_ID", required = false) String sessionId,
-                                      HttpServletResponse response) {
+                       HttpServletResponse response) {
         authService.logoutUser(sessionId, response);
     }
 }
