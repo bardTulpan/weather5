@@ -1,0 +1,127 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-location-table
+      author: bard
+      changes:
+        - createTable:
+            tableName: location
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_location_user_id
+                    references: user(id)
+              - column:
+                  name: latitude
+                  type: DECIMAL(10, 8)
+              - column:
+                  name: longitude
+                  type: DECIMAL(11, 8)
+
+        - createIndex:
+            indexName: idx_location_user_id
+            tableName: location
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            indexName: idx_location_coordinates
+            tableName: location
+            columns:
+              - column:
+                  name: latitude
+              - column:
+                  name: longitude
+
+        - insert:
+            tableName: location
+            columns:
+              - column:
+                  name: name
+                  value: "Эйфелева башня"
+              - column:
+                  name: user_id
+                  value: 1
+              - column:
+                  name: latitude
+                  value: 48.858370
+              - column:
+                  name: longitude
+                  value: 2.294481
+
+        - insert:
+            tableName: location
+            columns:
+              - column:
+                  name: name
+                  value: "Красная площадь"
+              - column:
+                  name: user_id
+                  value: 1
+              - column:
+                  name: latitude
+                  value: 55.753930
+              - column:
+                  name: longitude
+                  value: 37.620795
+
+        - insert:
+            tableName: location
+            columns:
+              - column:
+                  name: name
+                  value: "Статуя Свободы"
+              - column:
+                  name: user_id
+                  value: 2
+              - column:
+                  name: latitude
+                  value: 40.689249
+              - column:
+                  name: longitude
+                  value: -74.044500
+
+        - insert:
+            tableName: location
+            columns:
+              - column:
+                  name: name
+                  value: "Байкал"
+              - column:
+                  name: user_id
+                  value: 3
+              - column:
+                  name: latitude
+                  value: 53.500000
+              - column:
+                  name: longitude
+                  value: 108.000000
+
+        - insert:
+            tableName: location
+            columns:
+              - column:
+                  name: name
+                  value: "Сочи"
+              - column:
+                  name: user_id
+                  value: 3
+              - column:
+                  name: latitude
+                  value: 43.585472
+              - column:
+                  name: longitude
+                  value: 39.723098

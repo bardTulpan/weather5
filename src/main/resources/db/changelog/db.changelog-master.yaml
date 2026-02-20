@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/V1_1__create_user_table.yaml
+  - include:
+      file: db/changelog/v2_1__create_session_table.yaml
+  - include:
+      file: db/changelog/V3_1__create_location_table.yaml
